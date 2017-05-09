@@ -75,7 +75,7 @@ function bullet(X,Y,sizeX,sizeY,imagesrc){
     this.bulletattach=1;
     this.bulletsizeX=sizeX;
     this.bulletsizeY=sizeY;
-//行为
+
 /*
  移动行为
  */
@@ -197,29 +197,19 @@ var bianjie=function(){
 //}
 var bodyobj=document.getElementsByTagName("body")[0];
 if(document.addEventListener){
-    //为本方飞机添加移动和暂停
     mainDiv.addEventListener("mousemove",yidong,true);
-    //为本方飞机添加暂停事件
     selfplan.imagenode.addEventListener("click",zanting,true);
-    //为body添加判断本方飞机移出边界事件
     bodyobj.addEventListener("mousemove",bianjie,true);
-    //为暂停界面的继续按钮添加暂停事件
     suspenddiv.getElementsByTagName("button")[0].addEventListener("click",zanting,true);
 //    suspenddiv.getElementsByTagName("button")[1].addEventListener("click",chongxinkaishi,true);
-    //为暂停界面的返回主页按钮添加事件
     suspenddiv.getElementsByTagName("button")[2].addEventListener("click",jixu,true);
 }
 else if(document.attachEvent){
-    //为本方飞机添加移动
     mainDiv.attachEvent("onmousemove",yidong);
-    //为本方飞机添加暂停事件
     selfplan.imagenode.attachEvent("onclick",zanting);
-    //为body添加判断本方飞机移出边界事件
     bodyobj.attachEvent("onmousemove",bianjie);
-    //为暂停界面的继续按钮添加暂停事件
     suspenddiv.getElementsByTagName("button")[0].attachEvent("onclick",zanting);
 //    suspenddiv.getElementsByTagName("button")[1].attachEvent("click",chongxinkaishi,true);
-    //为暂停界面的返回主页按钮添加事件
     suspenddiv.getElementsByTagName("button")[2].attachEvent("click",jixu,true);
 }
 //初始化隐藏本方飞机
@@ -386,8 +376,3 @@ function jixu(){
     location.reload(true);
 }
 
-/*
-    完成界面的初始化
-    敌方小飞机一个
-    我方飞机一个
- */
