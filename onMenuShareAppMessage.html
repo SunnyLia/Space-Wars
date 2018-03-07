@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="Keywords" content="桂圆干/红枣/调味品/健康零添加/绿色食品/粮好/粮好商城/粮好加盟/hexian/企业团购/礼盒/坚果礼盒/零食/趣味零食" />
+  <title>粮好商城</title>
+  <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+  <script src="../js/jquery-1.11.1.min.js"></script>
+</head>
+<body>
+  <button class="onMenuShareTimeline">分享给朋友</button>
+  <script>
+    // 获取权限配置数据
+    $.ajax({
+      url: '/queryWxConfigForPromote.htm?url='+window.location.href,
+      type: 'GET',
+      dataType: 'JSON'
+    })
+    .done(function(data) {
+      // 通过config接口注入权限验证配置
+      wx.config({
+        debug: false, 
+        appId: data.appId, 
+        timestamp: data.timestamp,
+        nonceStr:data.nonceStr, 
+        signature: data.signature,
+        jsApiList: ['onMenuShareTimeline']
+      });
+    });
+
+    // 通过ready接口处理成功验证
+    wx.ready(function(){
+      // 获取“分享给朋友”按钮点击状态及自定义分享内容接口
+      $('.onMenuShareTimeline').on('click',function(){
+        wx.onMenuShareTimeline({
+          title: '什么歌', // 分享标题
+          link: 'https://y.qq.com/n/yqq/song/001LTv6e0kyLm5.html?ADTAG=baiduald&play=1', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+          imgUrl: '//y.gtimg.cn/music/photo_new/T002R300x300M000004Q5RrA2WFJAA.jpg?max_age=2592000', // 分享图标
+
+          trigger: function (res) {
+            // 不要尝试在trigger中使用ajax异步请求修改本次分享的内容，因为客户端分享操作是一个同步操作，这时候使用ajax的回包会还没有返回
+            alert('用户点击分享到朋友圈');
+          },
+          success: function (res) {
+            alert('已分享');
+          },
+          cancel: function (res) {
+            alert('已取消');
+          },
+          fail: function (res) {
+            alert(JSON.stringify(res));
+          }
+        });
+        alert('已注册获取“分享到朋友圈”状态事件');
+      })
+    });
+    // 通过error接口处理失败验证
+    wx.error(function(res){console.log(res)});
+
+  </script>
+</body>
+</html>
