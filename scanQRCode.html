@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>粮好商城</title>
+  <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+  <script src="../js/jquery-1.11.1.min.js"></script>
+</head>
+<body>
+  <button class="scanQRCode">微信扫一扫</button>
+  <script>
+    // 获取权限配置数据
+    $.ajax({
+      url: '/queryWxConfigForPromote.htm?url='+window.location.href,
+      type: 'GET',
+      dataType: 'JSON'
+    })
+    .done(function(data) {
+      // 通过config接口注入权限验证配置
+      wx.config({
+        debug: true, 
+        appId: data.appId, 
+        timestamp: data.timestamp,
+        nonceStr:data.nonceStr, 
+        signature: data.signature,
+        jsApiList: ['scanQRCode']
+      });
+    });
+
+    // 通过ready接口处理成功验证
+    wx.ready(function(){
+      $('.scanQRCode').on('click',function(){
+        wx.scanQRCode({
+        needResult: 0, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+        scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+        success: function (res) {
+          var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
+          alert(result);
+        }
+        });
+      })
+    });
+    // 通过error接口处理失败验证
+    wx.error(function(res){alert(res)});
+
+  </script>
+</body>
+</html>
