@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>订单支付</title>
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="stylesheet" href="/hexian/css/style.min.css"/>
+  <link rel="stylesheet" href="/hexian/css/sm.min.css">
+  <link rel="stylesheet" href="/hexian/css/sm-extend.min.css">
+  <link rel="stylesheet" href="/hexian/css/font_cx7p3thorwe45cdi.css">
+  <link rel="stylesheet" href="/hexian/css/swiper.min.css">
+  <link rel="stylesheet" href="/hexian/css/newstyle.m.css">
+  <link rel="stylesheet" href="/hexian/css/mypay.css">
+<script type="text/javascript">
+  var gloableBasePath = '';
+  var gloableProductUrl = gloableBasePath + '/item/';
+  var gloableMiniCartCount = '4';
+</script> <script type='text/javascript' src='/hexian/js/zepto.min.js' charset='utf-8'></script>
+  <script type="text/javascript" src="/hexian/js/art-template.3.0.min.js"></script>
+</head>
+<body>
+<div class="myheader">
+  <h1>订单支付</h1>
+</div>
+<div class="page page-current">
+  <div class="content" style="padding: 0;">
+    <div class="confirm-payment">
+      <span>该订单无法进行支付，如有疑问请联系下单人员或者客服</span>
+    </div>
+  </div>
+</div>
+</body>
+<iframe id="wxIframe" src></iframe>
+
+<script type='text/javascript' src='/hexian/js/sm/0.6.2/sm.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='/hexian/js/sm/0.6.2/sm-extend.min.js' charset='utf-8'></script>
+<script type='text/javascript'>
+  var orderBizType, orderId, orderNo, orderPrice;
+  $(function () {
+    orderBizType = $.trim($("#orderBizType").val());
+    orderId = $.trim($("#orderId").val());
+    orderNo = $.trim($("#order").attr("orderNo"));
+    orderPrice = $.trim($("#order").attr("orderPrice"));
+    payByWX();
+  });
+
+  function payByWX() {
+    $.ajax({
+      type: "POST",
+      url: "/doOfflineWxPay.htm",
+      data: {orderCode: orderNo, orderId: orderId},
+      cache: false,
+      success: function (res) {
+        if (res != null) {
+          if (res.code == '1') {
+            var context = res.context;
+            callPay(context.appId, context.timeStamp, context.nonceStr, context.package, context.sign);
+          } else if (res.msg != null && res.msg != '') {
+            showAlert({content: res.msg});
+          } else {
+            showAlert({content: '支付失败！'});
+          }
+        } else {
+          showAlert({content: '支付失败！'});
+        }
+      }
+    });
+  }
+
+  function callPay(appId, timeStamp, nonceStr, packages, sign) {
+    if (!WeixinJSBridge) {
+      showAlert({content: '当前浏览器不支付微信支付！'});
+    }
+    WeixinJSBridge.invoke('getBrandWCPayRequest', {
+      "appId": appId,
+      "timeStamp": timeStamp,
+      "nonceStr": nonceStr,
+      "package": packages,
+      "signType": "MD5",
+      "paySign": sign
+    }, function (res) {
+      WeixinJSBridge.log(res.err_msg);
+      if (res.err_msg == "get_brand_wcpay_request:ok") {
+        if (0 == orderBizType) {
+          showAlert({
+            content: '支付成功！', fun: function () {
+              // TODO
+            }
+          });
+        } else if (getGroupPayResult(orderId)) {
+          showAlert({
+            content: '支付成功！', fun: function () {
+              // TODO
+            }
+          });
+        }
+      } else if (res.err_msg == "get_brand_wcpay_request:cancel") {
+        showAlert({
+          content: '用户取消支付！', fun: function () {
+            // TODO
+          }
+        });
+      } else {
+        showAlert({
+          content: '支付失败！', fun: function () {
+            // TODO
+          }
+        });
+      }
+    });
+  }
+
+  //弹窗的公用方法
+  function showAlert(opt) {
+    if (opt.content != null && opt.content.length > 14) {
+      $.modal({
+        text: '<p class="unpaycode">' + opt.content + '</p>',
+        buttons: [{
+          text: '确定',
+          bold: true,
+          onClick: function () {
+            if (opt.fun != null) {
+              opt.fun();
+            }
+          }
+        }]
+      });
+    } else {
+      $.toast(opt.content);
+      setTimeout(function () {
+        if (opt.fun != null) {
+          opt.fun();
+        }
+      }, 2000);
+    }
+  }
+</script>
+</html>
